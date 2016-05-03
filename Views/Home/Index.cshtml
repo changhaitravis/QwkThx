@@ -1,17 +1,11 @@
-﻿<h2>Welcome to ASP.NET MVC @ViewData["Version"] on @ViewData["Runtime"]!</h2>
+﻿<h2>QwkThx</h2>
 
 <div id="content"></div>
 
 @using (Html.BeginForm())
 {
-	 <select name="handler">
-	  <option value="Person1">Person1</option>
-	  <option value="Person2">Person2</option>
-	  <option value="Person3">Person3</option>
-	  <option value="Person4">Person4</option>
-	</select> 
+	 @Html.DropDownList("handler", "Who is deserving of commendation?")
 	<textarea name="comment" rows="4" cols="50">
 	</textarea>
 	<button type="submit">Submit</button>
-
 }

@@ -7,41 +7,51 @@ using System.Web.Mvc;
 using System.Web.Mvc.Ajax;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace QwkThx.Controllers
 {
 	public class HomeController : Controller
 	{
 		[HttpGet]
-		public ActionResult Index ()
+		public ActionResult Index (string handler, string ticket, string customer)
 		{
-			var mvcName = typeof(Controller).Assembly.GetName ();
-			var isMono = Type.GetType ("Mono.Runtime") != null;
+			if (handler != null && ticket != null && customer != null) {
+				//If all parameters are in, then PostToSlack without resorting to post\
+				var payload = new SlackAttack();
+				payload.username = "QwkThx";
+				payload.text = handler + " received a thank you from " + customer;
+				return  !postToSlack(payload).IsCompleted? View ("Success") :  View ("Error");
+			} 
 
-			ViewData ["Version"] = mvcName.Version.Major + "." + mvcName.Version.Minor;
-			ViewData ["Runtime"] = isMono ? "Mono" : ".NET";
+			ViewData ["handler"] = new SelectList(new Team().Staff, handler);
+			ViewData ["Ticket"] = ticket;
+			ViewData ["Customer"] = customer;
+	
 
 			return View ();
 		}
 
 
 		[HttpPost]
-		public ActionResult Index (string handler, string comment)
+		public ActionResult Index (string handler, string comment, string ticket, string customer)
 		{	
 			var payload = new SlackAttack();
 			payload.username = "QwkThx";
 			payload.text = handler + " received a thank you with the note: \n" + comment;
-			var json = JsonConvert.SerializeObject(payload);
+			return  !postToSlack(payload).IsCompleted? View ("Success") :  View ("Error");
+		}
 
+		private Task<HttpResponseMessage> postToSlack(SlackAttack payload){
+			var json = JsonConvert.SerializeObject(payload);
 			HttpClient client = new HttpClient();
 			client.BaseAddress = new Uri("https://hooks.slack.com/");
 			//your slack "services/#########/#########/#############"webhook endpoint below
-			var response = client.PostAsync ("services/_______/_______/______________", new StringContent(json,
+			return client.PostAsync ("services/_______/_______/______________", new StringContent(json,
 				Encoding.UTF8, 
 				"application/json"));
-			return  !response.IsCompleted? View ("Success") :  View ("Error");
+			
 		}
-
 
 	}
 
@@ -51,5 +61,7 @@ namespace QwkThx.Controllers
 		public string username;
 		public string text;
 	}
+
+ 
 }
 
