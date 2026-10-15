@@ -1,0 +1,23 @@
+@model QwkThx.Models.ThankYouForm
+@{
+    ViewData["Title"] = "Say thanks";
+}
+
+<h1>QwkThx</h1>
+<p class="lede">Had a great support experience? Send the team a thank-you &mdash; it lands in Slack instead of re-opening your ticket.</p>
+
+<form asp-action="Index" method="post" class="thanks-form">
+    <label asp-for="Handler">Who is deserving of commendation?</label>
+    <select asp-for="Handler" asp-items="@(new SelectList(Model.Staff, nameof(QwkThx.Options.TeamMember.Username), nameof(QwkThx.Options.TeamMember.FullName)))">
+        <option value="">-- pick a teammate --</option>
+    </select>
+    <span asp-validation-for="Handler" class="field-error"></span>
+
+    <label asp-for="Comment">Your note</label>
+    <textarea asp-for="Comment" rows="4" cols="50" placeholder="What did they do well?"></textarea>
+
+    <input type="hidden" asp-for="Ticket" />
+    <input type="hidden" asp-for="Customer" />
+
+    <button type="submit">Submit</button>
+</form>
